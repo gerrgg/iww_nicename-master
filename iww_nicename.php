@@ -43,16 +43,63 @@ function nicename_menu(){
       <input type="hidden" name="action" value="set_price_breaks">
       <input type="submit" name="submit" value="Set Price Breaks">
     </form>
+
+    <!-- TODO: Create some JS which will fill form based on vendor. Like with Portwest
+     fill everything, helly hansen fill the stock indexes.
+   -->
+
     <form method="POST" action="<?php echo admin_url( 'admin-post.php' );?>">
+      <h6>Sync Vendor Form</h6>
+      <div class="form-group">
+        <label>Vendor</label>
+        <select name="name">
+          <option value="helly hansen" >Helly Hansen</option>
+          <option value="portwest" >Portwest</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>URL</label>
+        <input type="url" name="src" required />
+      </div>
+      <div class="form-group row">
+        <div class="col-6">
+          <label>SKU index</label>
+          <input type="number" name="sku_index" required />
+        </div>
+        <div class="col-6">
+          <label>Stock Index</label>
+          <input type="number" name="stock_index" required />
+        </div>
+        <div class="col-6">
+          <label>Dry Run?</label>
+          <input type="checkbox" value=1 name="dry_run" />
+        </div>
+      </div>
       <input type="hidden" name="action" value="sync_vendors">
-      <label>Vendor</label>
-      <select name="vendor">
-        <option value="helly hansen" selected>Helly Hansen</option>
-      </select>
-      <label>URL</label>
-      <input type="url" name="url" required/>
       <input type="submit" name="submit" value="sync_vendors">
     </form>
+    <Br>
+    <table>
+      <thead>
+        <th>VENDOR</th>
+        <th>URL</th>
+        <th>SKU INDEX</th>
+        <th>STOCK INDEX</th>
+      </thead>
+      <tr>
+        <td>Portwest</td>
+        <td><a href="http://www.portwest.us/downloads/sohUS.csv">http://www.portwest.us/downloads/sohUS.csv</a></td>
+        <td>1</td>
+        <td>8</td>
+      </tr>
+      <tr>
+        <td>Helly Hansen</td>
+        <td><a href="https://app.ivendix.com/">https://app.ivendix.com/</a></td>
+        <td>16</td>
+        <td>7</td>
+      </tr>
+    </table>
+
     <?php
     // $list = iww_get_data();
     // nice_list( $list );
@@ -67,6 +114,16 @@ add_action( 'admin_post_match_sku', 'update_sku', 1 );
 add_action( 'admin_post_fix_dims', 'iww_fix_dims', 1 );
 add_action( 'admin_post_set_price_breaks', 'iww_set_price_breaks', 1 );
 add_action( 'admin_post_sync_vendors', 'iww_nice_sync_vendors', 1 );
+
+function iww_nice_sync_vendors(){
+  $dry_run = isset( $_POST['dry_run'] );
+  iww_sync_vendor( array(
+    'name'    => $_POST['name'],
+    'src'       => $_POST['src'],
+    'sku_index'   => $_POST['sku_index'],
+    'stock_index' => $_POST['stock_index'],
+  ), $dry_run );
+}
 
 function iww_set_price_breaks(){
   $params = array(
